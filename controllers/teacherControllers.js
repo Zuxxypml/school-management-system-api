@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
-import { Teacher } from "../models/TeacherModel";
+import jwt from "jsonwebtoken";
+import { Teacher } from "../models/TeacherModel.js";
+
+// Token Generator
+const createToken = (_id) => {
+  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "3d" });
+};
 
 // Gets the Record of all teachers
 export const getAllTeachers = async (req, res) => {
@@ -16,7 +22,9 @@ export const createNewTeacher = async (req, res) => {
   const teacher = req.body;
   try {
     const createdTeacher = await Teacher.create({ ...teacher });
-    return res.status(200).json(createdTeacher);
+    const token = createToken(createdTeacher._id);
+
+    return res.status(200).json({ ...createdTeacher, token });
   } catch (error) {
     return res.status(404).json(error);
   }

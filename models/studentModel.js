@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import validator from "validator";
 
 const studentSchema = new mongoose.Schema(
   {
@@ -19,10 +21,50 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    password: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-export const Student = mongoose.model("student", studentSchema);
+// Sign up Static Method
+studentSchema.statics.signup = async function (
+  firstname,
+  lastname,
+  password,
+  email,
+  username
+) {
+  if (!email || !password || !firstname || !lastname || !username) {
+    throw Error("All fields are required");
+  }
+  if (!validator.isEmail(email)) {
+    throw Error("Email is not Valid");
+  }
+  if (!validator.isStrongPassword(password)) {
+    throw Error("Weak Password");
+  }
+  const ifEmailExists = await this.findOne({ email });
+  if (ifEmailExists) {
+    throw Error("Email in use");
+  }
+  // Encryption
+  const salt = await bcrypt.genSalt(13);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Create User Record
+  const user = await this.create({
+    email,
+    password: hashedPassword,
+    firstname,
+    lastname,
+    username,
+  });
+  return user;
+};
+
+export const Student = mongoose.model("Student", studentSchema);

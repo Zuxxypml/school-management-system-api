@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import { Student } from "../models/studentModel.js";
+
+// Token Generator
+const createToken = (_id) => {
+  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "3d" });
+};
 
 // Gets all students records
 export const getAllStudents = async (req, res) => {
@@ -13,12 +19,19 @@ export const getAllStudents = async (req, res) => {
 
 // Creates a new student record
 export const createNewStudent = async (req, res) => {
-  const student = req.body;
+  const { firstname, lastname, username, email, password } = req.body;
   try {
-    const createdStudent = await Student.create({ ...student });
-    return res.status(200).json(createdStudent);
+    const createdStudent = await Student.signup(
+      firstname,
+      lastname,
+      password,
+      email,
+      username
+    );
+    const token = createToken(createdStudent._id);
+    return res.status(200).json({ token, ...createdStudent._doc });
   } catch (error) {
-    return res.status(404).json(error);
+    return res.status(404).json({ error: error.message });
   }
 };
 
