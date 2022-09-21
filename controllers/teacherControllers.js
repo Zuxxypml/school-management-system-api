@@ -29,6 +29,7 @@ export const createNewTeacher = async (req, res) => {
     return res.status(404).json(error);
   }
 };
+
 // Update existing teacher record
 export const updateTeacherDetails = async (req, res) => {
   const updateData = req.body;

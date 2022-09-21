@@ -67,4 +67,19 @@ studentSchema.statics.signup = async function (
   return user;
 };
 
+studentSchema.statics.login = async function (username, password) {
+  if (!username || !password) {
+    throw Error("All fields are required");
+  }
+  const user = await this.findOne({ username });
+  if (!user) {
+    throw Error("Can't find matching credentials. Check and try again");
+  }
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    throw Error("Incorrect Password");
+  }
+  return user;
+};
+
 export const Student = mongoose.model("Student", studentSchema);

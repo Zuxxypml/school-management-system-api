@@ -68,3 +68,16 @@ export const deleteStudent = async (req, res) => {
     return res.status(404).json(error);
   }
 };
+
+// Logs student in to their accounts
+export const studentLogin = async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const loggedInStudent = await Student.login(username, password);
+    const token = createToken(loggedInStudent._id);
+
+    return res.status(200).json({ token, ...loggedInStudent._doc });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
