@@ -18,15 +18,20 @@ export const getAllTeachers = async (req, res) => {
 };
 
 // Creates a new teacher record
-export const createNewTeacher = async (req, res) => {
-  const teacher = req.body;
+export const createNewStudent = async (req, res) => {
+  const { firstname, lastname, username, email, password } = req.body;
   try {
-    const createdTeacher = await Teacher.create({ ...teacher });
+    const createdTeacher = await Teacher.signup(
+      firstname,
+      lastname,
+      password,
+      email,
+      username
+    );
     const token = createToken(createdTeacher._id);
-
-    return res.status(200).json({ ...createdTeacher, token });
+    return res.status(200).json({ token, ...createdTeacher._doc });
   } catch (error) {
-    return res.status(404).json(error);
+    return res.status(404).json({ error: error.message });
   }
 };
 
@@ -61,5 +66,18 @@ export const deleteTeacher = async (req, res) => {
     return res.status(200).json(deletedTeacher);
   } catch (error) {
     return res.status(404).json(error);
+  }
+};
+
+// Logs teacher in to their accounts
+export const teacherLogin = async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const loggedInTeacher = await Teacher.login(username, password);
+    const token = createToken(loggedInTeacher._id);
+
+    return res.status(200).json({ token, ...loggedInTeacher._doc });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
 };

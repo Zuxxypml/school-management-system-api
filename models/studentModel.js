@@ -57,29 +57,29 @@ studentSchema.statics.signup = async function (
   const hashedPassword = await bcrypt.hash(password, salt);
 
   // Create User Record
-  const user = await this.create({
+  const student = await this.create({
     email,
     password: hashedPassword,
     firstname,
     lastname,
     username,
   });
-  return user;
+  return student;
 };
 
 studentSchema.statics.login = async function (username, password) {
   if (!username || !password) {
     throw Error("All fields are required");
   }
-  const user = await this.findOne({ username });
-  if (!user) {
+  const student = await this.findOne({ username });
+  if (!student) {
     throw Error("Can't find matching credentials. Check and try again");
   }
-  const match = await bcrypt.compare(password, user.password);
+  const match = await bcrypt.compare(password, student.password);
   if (!match) {
     throw Error("Incorrect Password");
   }
-  return user;
+  return student;
 };
 
 export const Student = mongoose.model("Student", studentSchema);
