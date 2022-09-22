@@ -18,7 +18,7 @@ export const getAllTeachers = async (req, res) => {
 };
 
 // Creates a new teacher record
-export const createNewStudent = async (req, res) => {
+export const createNewTeacher = async (req, res) => {
   const { firstname, lastname, username, email, password } = req.body;
   try {
     const createdTeacher = await Teacher.signup(
